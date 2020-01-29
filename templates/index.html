@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Call Analyer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" type="text/css" media="screen" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" />
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row bg-light">
+                <!--Sidebar begin here-->
+                <div class="col-2 bg-dark">
+                    <nav class="nav nav-pills flex-column">
+                        <a class="nav-link active" href={{ url_for('upload') }}>Load Data</a>
+                        <a class="nav-link" href={{ url_for('csv')}}>Show CSV</a>
+                        <a class="nav-link" href={{ url_for('analyze')}}>Analyze Data</a>
+                    </nav>
+                </div>
+                <!--Sidebar end here-->
+                <div class="col-10">
+                        {% if not filename %}
+                            <form method=post enctype=multipart/form-data>
+                                <input class="form-control-file" type=file name=file>
+                            </br>
+                                <input class="btn btn-info" type=submit value=Upload>
+                            </form>
+                            {% else %}
+                            <p class="alert alert-primary">Data File Uploaded</p>
+                            <button class="btn btn-primary" data-toggle="collapse" href="#uploadNew" role="button" aria-expanded="false" aria-controls="uploadNew">Upload new file</a></button>
+                            <div class="collapse" id="uploadNew">
+                                <hr>
+                                <form class="container" method=post enctype=multipart/form-data>
+                                    <input class="form-control-file" type=file name=file>
+                                </br>
+                                    <input class="btn btn-info" type=submit value=Upload>
+                                </form>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+        </div>
+    
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+</body>
+</html>

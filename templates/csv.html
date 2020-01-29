@@ -1,0 +1,66 @@
+<!DOCTYPE <!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>CSV file of Call Log</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" />
+    <style>
+       
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row bg-light">
+
+        <!--Sidebar begin here-->
+        <div class="col-2 bg-dark">
+                <nav class="nav nav-pills flex-column">
+                    <a class="nav-link" href={{ url_for('upload') }}>Load Data</a>
+                    <a class="nav-link active" href={{ url_for('csv')}}>Show CSV</a>
+                    <a class="nav-link" href={{ url_for('analyze')}}>Analyze Data</a>
+                </nav>
+            </div>
+        <!--Sidebar end here -->
+        <div class="col-10">
+
+                <form method="POST">
+                    <div class="form-row input-group mb-3">
+                        <div class="col-1">
+                            <p>Select Date:</p>
+                        </div>
+                        <div class="col-3">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">From</span>
+                                    </div>
+                                    <input class="form-control" type="date" name="from">
+                                </div>
+                        </div>
+                        <div class="col-3">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">Till</span>
+                                    </div> 
+                                    <input class="form-control" type="date" name="till">
+                                </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-info">Analyze</button>
+                </form>
+
+            {% if data %}
+                {{ data }}  
+            {% else %}
+                <p class="alert alert-danger">Please upload your Data File to see CSV</p>
+            {% endif %}
+        </div>
+    </div>
+    <script>
+        document.getElementsByTagName("table")[0].className="table table-bordered table-hover";
+    </script>
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+</body>
+</html>

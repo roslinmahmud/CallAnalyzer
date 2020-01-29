@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Call Analyzer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row bg-light">
+
+            <!--Sidebar begin here-->
+            <!--Sidebar begin here-->
+            <div class="col-2 bg-dark">
+                <nav class="nav nav-pills flex-column">
+                    <a class="nav-link" href={{ url_for('upload') }}>Load Data</a>
+                    <a class="nav-link" href={{ url_for('csv')}}>Show CSV</a>
+                    <a class="nav-link active" href={{ url_for('analyze')}}>Analyze Data</a>
+                </nav>
+             </div>
+            <!--Sidebar end here -->
+
+            <div class="col-10">
+                <!--User input begin here-->
+                {% if number_list %}
+                    <form method="POST">
+                        <div class="form-row input-group mb-3">
+                            <div class="col-1">
+                                <p>Mobile No:</p>
+                            </div>
+                            <div class="col-3">
+                                <select class="form-control" name="number">
+                                    {% for number in number_list %}
+                                        <option value="{{ number }}">{{ number }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row input-group mb-3">
+                            <div class="col-1">
+                                <p>Select Type:</p>
+                            </div>
+                            <div class="col-3">
+                                <select class="form-control" name="type">
+                                    <option value="general">General Analysis</option>
+                                    <option value="top_ten">Top Ten Communicator</option>
+                                    <option value="most_talk">Top Most Talk Time</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row input-group mb-3">
+                            <div class="col-1">
+                                <p>Select Date:</p>
+                            </div>
+                            <div class="col-3">
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">From</span>
+                                        </div>
+                                        <input class="form-control" type="date" name="from">
+                                    </div>
+                            </div>
+                            <div class="col-3">
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">Till</span>
+                                        </div> 
+                                        <input class="form-control" type="date" name="till">
+                                    </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-info">Analyze</button>
+                    </form>
+                {% else %}
+                    <p class="alert alert-danger">Please upload your Data File to analyze data!</p>
+                {% endif %}
+                <!--User input end here-->
+                
+                <!-- General Analysis begin here-->
+                {% if analyze_type == 'general' %}
+                    <div class="container-fluid">
+                        <hr>
+                        <h5>General Analysis:</h5>
+                        <ul>
+                            <li><h6>Most Talked Contact: <i>{{ max_talk_num }}</i> [{{ max_talk_time }} hours]</h6></li>
+                            <li><h6>Most Frequent Contact: <i>{{ most_frequent_contact[0] }}</i> [{{ most_frequent_count[0] }} times]</h6></li>
+                            <li><h6>No. of Communicator: <i>{{ total_communicator }}</i></h6></li>
+                            <li><h6>Total Talk Time: <i>{{ total_talk_time }}</i> hours</h6></li>
+                            <li><h6>Total Call Send: <i>{{ total_call_send }}</i></h6></li>
+                            <li><h6>Total Call Receive: <i>{{ total_call_receive }}</i></h6></li>
+                            
+                        </ul>
+                    </div>
+                    <!--Graph begin here-->
+                    <div class="container">
+                        <div class="container-fluid" align="center"><h6>Talk Time Chart</h6></div>
+                        <hr>
+                        <script>
+                        var x_axis = {{ receiver_list }}
+                        var y_axis = {{ talk_time_list }}
+                        
+                        len = x_axis.length;
+                        
+                        // RGBA Color Generator for Graph
+                        color = [];
+                        bcolor = [];
+                        for(var i=1;i<=len;i++){
+                            var r = Math.ceil(Math.random()*255);
+                            var g = Math.ceil(Math.random()*255);
+                            var b = Math.ceil(Math.random()*255);
+                            color.push( "rgba(" + r +"," + g + ", " + b + ", 0.2)" );
+                            bcolor.push( "rgba(" + r +"," + g + ", " + b + ", 1)" );
+                        }
+                        </script>
+                        <canvas id="myChart" width="100" height="50"></canvas>
+                        <script>
+                        var ctx = document.getElementById("myChart").getContext('2d');
+                        var myChart = new Chart(ctx, {
+                            type: 'pie',
+                            data: {
+                                labels: x_axis,
+                                datasets: [{
+                                    data: y_axis ,
+                                    backgroundColor: color,
+                                    borderColor: bcolor,
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                legend: {
+                                    display: false
+                                }
+                            }
+                        });
+                        </script>
+                    </div>
+                    <!--Graph end here-->
+                    <!--Graph begin here-->
+                    <div class="container">
+                            <div class="container-fluid" align="center"><h6>Call Frequency Chart</h6></div>
+                            <hr>
+                            <script>
+                            var x_axis = {{ most_frequent_contact }}
+                            var y_axis = {{ most_frequent_count }}
+                            
+                            len = x_axis.length;
+                            
+                            // RGBA Color Generator for Graph
+                            color = [];
+                            bcolor = [];
+                            for(var i=1;i<=len;i++){
+                                var r = Math.ceil(Math.random()*255);
+                                var g = Math.ceil(Math.random()*255);
+                                var b = Math.ceil(Math.random()*255);
+                                color.push( "rgba(" + r +"," + g + ", " + b + ", 0.2)" );
+                                bcolor.push( "rgba(" + r +"," + g + ", " + b + ", 1)" );
+                            }
+                            </script>
+                            <canvas id="myChartex" width="100" height="50"></canvas>
+                            <script>
+                            var ctx = document.getElementById("myChartex").getContext('2d');
+                            var myChart = new Chart(ctx, {
+                                type: 'pie',
+                                data: {
+                                    labels: x_axis,
+                                    datasets: [{
+                                        data: y_axis ,
+                                        backgroundColor: color,
+                                        borderColor: bcolor,
+                                        borderWidth: 1
+                                    }]
+                                },
+                                options: {
+                                    legend: {
+                                        display: false
+                                    }
+                                }
+                            });
+                            </script>
+                        </div>
+                    <!--Graph end here-->
+                {% endif %}
+                <!-- General Analysis end here -->
+
+                <!--Top Ten Communicator begin here-->
+                {% if analyze_type == 'top_ten' %}
+                    <div class="container-fluid">
+                        <hr>
+                        <h5>Top Ten Communicator:</h5>
+                        <ol>
+                            {% for number,count in top_ten_communicator %}
+                                <h6><li>{{ number }} - {{ count }} times</h6></li>
+                            {% endfor %}
+                        </ol>
+                        
+                    </div>
+                    <!--Graph begin here-->
+                    <div class="container">
+                        <script>
+                        var x_axis = {{ most_frequent_contact }}
+                        var y_axis = {{ most_frequent_count }}
+                        
+                        len = x_axis.length;
+                        
+                        // RGBA Color Generator for Graph
+                        color = [];
+                        bcolor = [];
+                        for(var i=1;i<=len;i++){
+                            var r = Math.ceil(Math.random()*255);
+                            var g = Math.ceil(Math.random()*255);
+                            var b = Math.ceil(Math.random()*255);
+                            color.push( "rgba(" + r +"," + g + ", " + b + ", 0.2)" );
+                            bcolor.push( "rgba(" + r +"," + g + ", " + b + ", 1)" );
+                        }
+                        </script>
+                        <canvas id="myChart" width="100" height="50"></canvas>
+                        <script>
+                        var ctx = document.getElementById("myChart").getContext('2d');
+                        var myChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: x_axis,
+                                datasets: [{
+                                    label: 'Call Analyzing',
+                                    data: y_axis ,
+                                    backgroundColor: color,
+                                    borderColor: bcolor,
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                scales: {
+                                    yAxes: [{
+                                        ticks: {
+                                            beginAtZero:true
+                                        }
+                                    }]
+                                }
+                            }
+                        });
+                        </script>
+                    </div>
+                    <!--Graph end here-->
+                {% endif %}
+                <!--Top Ten Communicator end here-->
+
+                <!--Top Ten Communicator begin here-->
+                {% if analyze_type == 'most_talk' %}
+                    <div class="container-fluid">
+                        <hr>
+                        <h5>Top Most Communicator:</h5>
+                        <ol>
+                            {% for time,number in top_talked_communicator %}
+                                <h6><li>{{ number }} - {{ time }} hours</h6></li>
+                            {% endfor %}
+                        </ol>
+                        
+                    </div>
+                    <!--Graph begin here-->
+                    <div class="container">
+                        <script>
+                        var x_axis = {{ receiver_list }}
+                        var y_axis = {{ talk_time_list }}
+                        
+                        len = x_axis.length;
+                        
+                        // RGBA Color Generator for Graph
+                        color = [];
+                        bcolor = [];
+                        for(var i=1;i<=len;i++){
+                            var r = Math.ceil(Math.random()*255);
+                            var g = Math.ceil(Math.random()*255);
+                            var b = Math.ceil(Math.random()*255);
+                            color.push( "rgba(" + r +"," + g + ", " + b + ", 0.2)" );
+                            bcolor.push( "rgba(" + r +"," + g + ", " + b + ", 1)" );
+                        }
+                        </script>
+                        <canvas id="myChart" width="100" height="50"></canvas>
+                        <script>
+                        var ctx = document.getElementById("myChart").getContext('2d');
+                        var myChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: x_axis,
+                                datasets: [{
+                                    label: 'Call Analyzing',
+                                    data: y_axis ,
+                                    backgroundColor: color,
+                                    borderColor: bcolor,
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                scales: {
+                                    yAxes: [{
+                                        ticks: {
+                                            beginAtZero:true
+                                        }
+                                    }]
+                                }
+                            }
+                        });
+                        </script>
+                    </div>
+                    <!--Graph end here-->
+                {% endif %}
+                <!--Top Ten Communicator end here-->
+
+            </div>
+
+        </div>
+    
+
+    </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+</body>
+</html>
